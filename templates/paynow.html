@@ -13,6 +13,9 @@
 
         <button class="btn" onclick="transfer()">Submit</button>
         <button class="btn" onclick="transaction()">View Transaction</button>
+        <p id ="view_payer"></p>
+        <p id ="view_payee"></p>
+        <p id ="view_amount"></p>
         <form action="/" method="post">
             <input type="submit" value="Main">
         </form>
@@ -74,15 +77,25 @@
                 }
             ]; 
 
-            const web3 = new Web3(Web3.givenProvider);
+            const web3 = new Web3(Web3.givenProvider); // This will use the provider injected by MetaMask which is Infura
             const contract = new web3.eth.Contract(contractABI,contractAddress)
 
             
             async function transfer() {
+                const accounts = await web3.eth.requestAccounts();
+                const payer = document.getElementById("payer").value;
+                const payee = document.getElementById("payee").value;
+                const amount = document.getElementById("amount").value;
+
+                await contract.methods.weixin(payer, payee, amount).send({ from: accounts[0] })
 
             }
 
             async function transaction() {
+                const result = await contract.methods.transaction().call();
+                document.getElementById("view_payer").innerText = result[0];
+                document.getElementById("view_payee").innerText = result[1];
+                document.getElementById("view_amount").innerText = result[2];
                 
             }
         </script>
